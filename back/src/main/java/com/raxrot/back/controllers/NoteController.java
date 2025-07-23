@@ -1,7 +1,9 @@
 package com.raxrot.back.controllers;
 
+import com.raxrot.back.dtos.NoteRequest;
 import com.raxrot.back.models.Note;
 import com.raxrot.back.services.NoteService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,11 +22,11 @@ public class NoteController {
     }
 
     @PostMapping
-    public ResponseEntity<Note> createNote(@RequestBody String content,
+    public ResponseEntity<Note> createNote(@Valid @RequestBody NoteRequest noteRequest,
                                            @AuthenticationPrincipal UserDetails userDetails) {
         String username = userDetails.getUsername();
         System.out.println("USER DETAILS: " + username);
-        Note createdNote = noteService.createNoteForUser(username, content);
+        Note createdNote = noteService.createNoteForUser(username, noteRequest.getContent());
         return new ResponseEntity<>(createdNote, HttpStatus.CREATED);
     }
 
@@ -38,10 +40,10 @@ public class NoteController {
 
     @PutMapping("/{noteId}")
     public ResponseEntity<Note> updateNote(@PathVariable Long noteId,
-                                           @RequestBody String content,
+                                           @Valid @RequestBody NoteRequest noteRequest,
                                            @AuthenticationPrincipal UserDetails userDetails) {
         String username = userDetails.getUsername();
-        Note updatedNote = noteService.updateNoteForUser(noteId, content, username);
+        Note updatedNote = noteService.updateNoteForUser(noteId, noteRequest.getContent(), username);
         return new ResponseEntity<>(updatedNote, HttpStatus.OK);
     }
 
