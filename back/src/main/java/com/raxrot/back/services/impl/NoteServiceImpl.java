@@ -1,5 +1,6 @@
 package com.raxrot.back.services.impl;
 
+import com.raxrot.back.configurations.AppConfig;
 import com.raxrot.back.exceptions.ApiException;
 import com.raxrot.back.models.Note;
 import com.raxrot.back.repositories.NoteRepository;
@@ -34,11 +35,11 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public Note updateNoteForUser(Long noteId, String content, String username) {
         Note note = noteRepository.findById(noteId).orElseThrow(()
-                -> new ApiException("Note not found"));
+                -> new ApiException(AppConfig.NOTE_ERROR_NOT_FOUND));
 
         //temp protection
         if (!note.getOwnerUsername().equals(username)) {
-            throw new ApiException("You cannot edit someone else's note");
+            throw new ApiException(AppConfig.NOTE_ERROR_UPDATE_FORBIDDEN);
         }
 
         note.setContent(content);
@@ -49,11 +50,11 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public void deleteNoteForUser(Long noteId, String username) {
         Note note = noteRepository.findById(noteId)
-                .orElseThrow(() -> new ApiException("Note not found"));
+                .orElseThrow(() -> new ApiException(AppConfig.NOTE_ERROR_NOT_FOUND));
 
         //temp protection
         if (!note.getOwnerUsername().equals(username)) {
-            throw new ApiException("You cannot delete someone else's note");
+            throw new ApiException(AppConfig.NOTE_ERROR_DELETE_FORBIDDEN);
         }
         noteRepository.delete(note);
     }
