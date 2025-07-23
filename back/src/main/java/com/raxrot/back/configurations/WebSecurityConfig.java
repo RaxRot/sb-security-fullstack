@@ -15,7 +15,7 @@ public class WebSecurityConfig
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.authorizeHttpRequests(requests ->{
-           requests.requestMatchers("/hello").permitAll().anyRequest().authenticated();
+           requests.requestMatchers("/hello","/public/**").permitAll().anyRequest().authenticated();
         });
         http.sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
