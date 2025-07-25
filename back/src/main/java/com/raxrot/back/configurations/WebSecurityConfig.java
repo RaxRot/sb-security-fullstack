@@ -5,8 +5,7 @@ import com.raxrot.back.models.Role;
 import com.raxrot.back.models.User;
 import com.raxrot.back.repositories.RoleRepository;
 import com.raxrot.back.repositories.UserRepository;
-import com.raxrot.back.security.filters.CustomLoggingFilter;
-import com.raxrot.back.security.filters.RequestValidationFilter;
+
 import com.raxrot.back.security.jwt.AuthEntryPointJwt;
 import com.raxrot.back.security.jwt.AuthTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +45,7 @@ public class WebSecurityConfig
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, CustomLoggingFilter customLoggingFilter, RequestValidationFilter requestValidationFilter) throws Exception{
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.authorizeHttpRequests(requests ->{
            requests.requestMatchers("/api/auth/public/**").permitAll()
                    .anyRequest().authenticated();
