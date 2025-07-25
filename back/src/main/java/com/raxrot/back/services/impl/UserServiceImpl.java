@@ -56,4 +56,10 @@ public class UserServiceImpl implements UserService {
         UserDTO userDTO = modelMapper.map(user, UserDTO.class);
         return userDTO;
     }
+
+    @Override
+    public User findByUsername(String username) {
+        User user=userRepository.findByUserName(username).orElseThrow(() -> new ApiException("User not found"));
+        return user;
+    }
 }
