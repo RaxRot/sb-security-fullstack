@@ -1,4 +1,4 @@
-package com.raxrot.back.security;
+package com.raxrot.back.security.filters;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
