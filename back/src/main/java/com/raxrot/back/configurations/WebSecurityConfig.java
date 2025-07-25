@@ -5,7 +5,6 @@ import com.raxrot.back.models.Role;
 import com.raxrot.back.models.User;
 import com.raxrot.back.repositories.RoleRepository;
 import com.raxrot.back.repositories.UserRepository;
-
 import com.raxrot.back.security.jwt.AuthEntryPointJwt;
 import com.raxrot.back.security.jwt.AuthTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -52,14 +50,14 @@ public class WebSecurityConfig
         });
         http.sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.httpBasic(Customizer.withDefaults());
+        //http.httpBasic(Customizer.withDefaults());
+        http.httpBasic(req->req.disable());
         http.csrf(csrf->csrf.disable());
 
         //http.addFilterBefore(customLoggingFilter, UsernamePasswordAuthenticationFilter.class);
         //http.addFilterBefore(requestValidationFilter, CustomLoggingFilter.class);
         http.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler));
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 
