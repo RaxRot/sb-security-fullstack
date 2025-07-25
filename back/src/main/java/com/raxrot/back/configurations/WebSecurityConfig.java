@@ -18,7 +18,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.time.LocalDate;
 
@@ -37,8 +36,8 @@ public class WebSecurityConfig
         http.httpBasic(Customizer.withDefaults());
         http.csrf(csrf->csrf.disable());
 
-        http.addFilterBefore(customLoggingFilter, UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(requestValidationFilter, CustomLoggingFilter.class);
+        //http.addFilterBefore(customLoggingFilter, UsernamePasswordAuthenticationFilter.class);
+        //http.addFilterBefore(requestValidationFilter, CustomLoggingFilter.class);
 
         return http.build();
     }
