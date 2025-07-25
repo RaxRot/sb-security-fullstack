@@ -5,6 +5,8 @@ import com.raxrot.back.models.Role;
 import com.raxrot.back.models.User;
 import com.raxrot.back.repositories.RoleRepository;
 import com.raxrot.back.repositories.UserRepository;
+import com.raxrot.back.security.CustomLoggingFilter;
+import com.raxrot.back.security.RequestValidationFilter;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +15,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.time.LocalDate;
 
@@ -23,7 +28,7 @@ import java.time.LocalDate;
 public class WebSecurityConfig
 {
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+    SecurityFilterChain securityFilterChain(HttpSecurity http, CustomLoggingFilter customLoggingFilter, RequestValidationFilter requestValidationFilter) throws Exception{
         http.authorizeHttpRequests(requests ->{
            requests.anyRequest().authenticated();
         });
@@ -31,6 +36,10 @@ public class WebSecurityConfig
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.httpBasic(Customizer.withDefaults());
         http.csrf(csrf->csrf.disable());
+
+        http.addFilterBefore(customLoggingFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(requestValidationFilter, CustomLoggingFilter.class);
+
         return http.build();
     }
 
@@ -55,7 +64,14 @@ public class WebSecurityConfig
      */
 
     @Bean
-    public CommandLineRunner initData(RoleRepository roleRepository, UserRepository userRepository) {
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public CommandLineRunner initData(RoleRepository roleRepository,
+                                      UserRepository userRepository,
+                                      PasswordEncoder passwordEncoder) {
         return args -> {
             Role userRole = roleRepository.findByRoleName(AppRole.ROLE_USER)
                     .orElseGet(() -> roleRepository.save(new Role(AppRole.ROLE_USER)));
@@ -64,7 +80,7 @@ public class WebSecurityConfig
                     .orElseGet(() -> roleRepository.save(new Role(AppRole.ROLE_ADMIN)));
 
             if (!userRepository.existsByUserName("user")) {
-                User user1 = new User("user", "user@example.com", "{noop}12345");
+                User user1 = new User("user", "user@example.com", passwordEncoder.encode("12345"));
                 user1.setAccountNonLocked(false);
                 user1.setAccountNonExpired(true);
                 user1.setCredentialsNonExpired(true);
@@ -78,7 +94,7 @@ public class WebSecurityConfig
             }
 
             if (!userRepository.existsByUserName("admin")) {
-                User admin = new User("admin", "admin@example.com", "{noop}12345");
+                User admin = new User("admin", "admin@example.com", passwordEncoder.encode("12345"));
                 admin.setAccountNonLocked(true);
                 admin.setAccountNonExpired(true);
                 admin.setCredentialsNonExpired(true);
